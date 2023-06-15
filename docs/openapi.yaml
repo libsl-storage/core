@@ -1,0 +1,1065 @@
+openapi: 3.0.1
+info:
+  title: LibSL Storage API
+  version: 0.0.1
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /specification:
+    post:
+      tags:
+      - specification-controller
+      summary: Create specification
+      description: Create specification with specified name and description in specified
+        directory
+      operationId: createSpecification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSpecificationRequest'
+        required: true
+      responses:
+        "200":
+          description: Specification created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+        "400":
+          description: Specification by specified path already exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+        "403":
+          description: Only directory owner can create specifications
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+        "404":
+          description: Specified parent directory not exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+      security:
+      - cookieAuth: []
+  /specification/{specificationId}/tag:
+    get:
+      tags:
+      - specification-tag-controller
+      summary: Get specification tags
+      description: Get specification tags
+      operationId: getBySpecificationId
+      parameters:
+      - name: specificationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Specification tags
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        "404":
+          description: Specification not exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+    post:
+      tags:
+      - specification-tag-controller
+      summary: Add tag to specification
+      description: Create tag for specification
+      operationId: create
+      parameters:
+      - name: specificationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTagRequest'
+        required: true
+      responses:
+        "200":
+          description: Specification tag added
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        "403":
+          description: Only specification owner can update or update it
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        "404":
+          description: Specification tag not exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+      security:
+      - cookieAuth: []
+  /specification/{id}:
+    get:
+      tags:
+      - specification-controller
+      summary: Get specification
+      description: Get specification by id
+      operationId: getSpecificationById
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Specification
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+        "404":
+          description: Specification not exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+    post:
+      tags:
+      - specification-controller
+      summary: Update specification
+      description: Update specification description
+      operationId: updateSpecification
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSpecificationRequest'
+        required: true
+      responses:
+        "200":
+          description: Specification updated
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+        "400":
+          description: Directory by specified path already exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+        "403":
+          description: Only specification owner can update it
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+        "404":
+          description: Specification not exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationResponse'
+      security:
+      - cookieAuth: []
+    delete:
+      tags:
+      - specification-controller
+      summary: Delete specification
+      description: Delete specification
+      operationId: deleteSpecification
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Specification deleted
+        "403":
+          description: Only specification owner can delete it
+        "404":
+          description: Specification not exists
+      security:
+      - cookieAuth: []
+  /specification/{id}/upload:
+    post:
+      tags:
+      - specification-controller
+      summary: Upload specification file
+      description: Upload and process specification source file
+      operationId: updateSpecificationFile
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: object
+              properties:
+                lslFile:
+                  type: string
+                  format: binary
+        required: true
+      responses:
+        "200":
+          description: Specification file uploaded and processed
+        "403":
+          description: Only specification owner can update it
+        "404":
+          description: Specification not exists
+        "500":
+          description: Specification processing error
+      security:
+      - cookieAuth: []
+  /specification/page/page:
+    post:
+      tags:
+      - specification-page-controller
+      summary: Get specification page
+      description: Get specification page by specified number and filters
+      operationId: pageSpecification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SpecificationPageRequest'
+        required: true
+      responses:
+        "200":
+          description: Specification page
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageSpecificationDTO'
+  /directory:
+    post:
+      tags:
+      - directory-controller
+      summary: Create directory
+      description: Create directory with specified name in specified directory
+      operationId: create_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDirectoryRequest'
+        required: true
+      responses:
+        "201":
+          description: Directory created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DirectoryResponse'
+        "400":
+          description: Directory by specified path already exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DirectoryResponse'
+        "403":
+          description: Only directory owner can create subdirectories
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DirectoryResponse'
+        "404":
+          description: Specified parent directory not exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DirectoryResponse'
+      security:
+      - cookieAuth: []
+  /auth/refresh:
+    post:
+      tags:
+      - authentication-controller
+      summary: Refresh access token
+      description: Authenticate user by email and password
+      operationId: refresh
+      parameters:
+      - name: accessToken
+        in: cookie
+        required: true
+        schema:
+          type: string
+      - name: refreshToken
+        in: cookie
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Updates access and refresh token cookies
+      security:
+      - cookieRefresh: []
+  /auth/login:
+    post:
+      tags:
+      - authentication-controller
+      summary: Authenticate user
+      description: Authenticate user by email and password
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          description: Sets access and refresh token cookies
+        "401":
+          description: Incorrect authentication data
+  /account:
+    get:
+      tags:
+      - account-controller
+      summary: Get current account data
+      description: Get current account data
+      operationId: getCurrentAccount
+      responses:
+        "200":
+          description: Current account
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+      security:
+      - cookieAuth: []
+    post:
+      tags:
+      - account-controller
+      summary: Change current account data
+      description: Change current account name
+      operationId: updateCurrentAccount
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountRequest'
+        required: true
+      responses:
+        "200":
+          description: Account updated
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+      security:
+      - cookieAuth: []
+  /account/updatePassword:
+    post:
+      tags:
+      - account-controller
+      summary: Change current account data
+      description: Change current account name
+      operationId: updatePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAccountPasswordRequest'
+        required: true
+      responses:
+        "200":
+          description: Password updated
+        "400":
+          description: Password must be between 8 and 30 characters
+        "403":
+          description: Specified old password not matches
+      security:
+      - cookieAuth: []
+  /account/register:
+    post:
+      tags:
+      - account-controller
+      summary: Register new account
+      description: "Register account with specified name, email and password"
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAccountRequest'
+        required: true
+      responses:
+        "201":
+          description: Account created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+        "400":
+          description: Specified email already taken
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AccountResponse'
+  /specification/{specificationId}/error:
+    get:
+      tags:
+      - specification-error-controller
+      summary: Get specification errors
+      description: Get specification errors due file processing
+      operationId: getBySpecificationId_1
+      parameters:
+      - name: specificationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Specification processing errors
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationErrorResponse'
+        "404":
+          description: Specification not exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SpecificationErrorResponse'
+      security:
+      - cookieAuth: []
+  /specification/{specificationId}/automaton:
+    get:
+      tags:
+      - specification-automaton-controller
+      summary: Get specification automatons
+      description: Get specification automatons
+      operationId: getBySpecificationId_2
+      parameters:
+      - name: specificationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AutomatonResponse'
+  /specification/{id}/content:
+    get:
+      tags:
+      - specification-controller
+      summary: Get specification content
+      description: Get source file content of specification
+      operationId: getSpecificationContent
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Specification source file content
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          description: Specification not exists
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "409":
+          description: Specification has no content
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+      security:
+      - cookieAuth: []
+  /specification/page/page/filters:
+    get:
+      tags:
+      - specification-page-controller
+      summary: Get specification filters
+      description: Get titles and keys of available specification page filters
+      operationId: getAvailableFilters
+      responses:
+        "200":
+          description: Specification page filters
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FilterResponse'
+  /directory/children:
+    get:
+      tags:
+      - directory-controller
+      summary: Get subdirectories
+      description: Get subdirectories in root (without parent directory)
+      operationId: getDirectoryChildren
+      responses:
+        "200":
+          description: Root subdirectories
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DirectoryChildrenResponse'
+  /directory/children/{id}:
+    get:
+      tags:
+      - directory-controller
+      summary: Get subdirectories
+      description: Get subdirectories of specified directory
+      operationId: getDirectoryChildren_1
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Directory subdirectories
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DirectoryChildrenResponse'
+        "404":
+          description: Specified parent directory not exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DirectoryChildrenResponse'
+  /specification/{specificationId}/tag/{tagId}:
+    delete:
+      tags:
+      - specification-tag-controller
+      summary: Delete specification tag
+      description: Delete tag by specified id
+      operationId: delete
+      parameters:
+      - name: specificationId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Specification tag deleted
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        "403":
+          description: Only specification owner can update or update it
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+        "404":
+          description: Specification tag not exists
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/TagResponse'
+      security:
+      - cookieAuth: []
+components:
+  schemas:
+    CreateSpecificationRequest:
+      required:
+      - description
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        directoryId:
+          type: integer
+          format: int64
+    SpecificationResponse:
+      required:
+      - description
+      - id
+      - name
+      - path
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        path:
+          type: string
+    CreateTagRequest:
+      required:
+      - key
+      - value
+      type: object
+      properties:
+        key:
+          type: string
+          enum:
+          - libraries
+          - versions
+          - languages
+          - url
+          - other
+        value:
+          type: string
+    TagDTO:
+      required:
+      - id
+      - value
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        value:
+          type: string
+    TagGroupDTO:
+      required:
+      - key
+      - tags
+      type: object
+      properties:
+        key:
+          type: string
+          enum:
+          - libraries
+          - versions
+          - languages
+          - url
+          - other
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagDTO'
+    TagResponse:
+      required:
+      - tagGroups
+      type: object
+      properties:
+        tagGroups:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagGroupDTO'
+    UpdateSpecificationRequest:
+      required:
+      - description
+      type: object
+      properties:
+        description:
+          type: string
+    SpecificationFilterRequest:
+      required:
+      - key
+      - value
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    SpecificationPageRequest:
+      required:
+      - filters
+      - page
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+        filters:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpecificationFilterRequest'
+    PageSpecificationDTO:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpecificationDTO'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/SortObject'
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+        paged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        empty:
+          type: boolean
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+    SpecificationDTO:
+      required:
+      - description
+      - id
+      - name
+      - path
+      - tags
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        path:
+          type: string
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagDTO'
+    CreateDirectoryRequest:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+        parentId:
+          type: integer
+          format: int64
+    DirectoryResponse:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+    LoginRequest:
+      required:
+      - email
+      - password
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    UpdateAccountRequest:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+    AccountResponse:
+      required:
+      - email
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+        name:
+          type: string
+    UpdateAccountPasswordRequest:
+      required:
+      - newPassword
+      - oldPassword
+      type: object
+      properties:
+        oldPassword:
+          type: string
+        newPassword:
+          maxLength: 30
+          minLength: 8
+          type: string
+    CreateAccountRequest:
+      required:
+      - email
+      - name
+      - password
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        password:
+          maxLength: 30
+          minLength: 8
+          type: string
+    SpecificationErrorDTO:
+      required:
+      - endPosition
+      - message
+      - startPosition
+      type: object
+      properties:
+        message:
+          type: string
+        startPosition:
+          type: integer
+          format: int32
+        endPosition:
+          type: integer
+          format: int32
+    SpecificationErrorResponse:
+      required:
+      - errors
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/SpecificationErrorDTO'
+    AutomatonCallDTO:
+      required:
+      - automatonId
+      - initStateId
+      type: object
+      properties:
+        automatonId:
+          type: integer
+          format: int64
+        initStateId:
+          type: integer
+          format: int64
+    AutomatonDTO:
+      required:
+      - functions
+      - id
+      - name
+      - shifts
+      - states
+      - type
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        type:
+          type: string
+        states:
+          type: array
+          items:
+            $ref: '#/components/schemas/StateDTO'
+        shifts:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShiftDTO'
+        functions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunctionDTO'
+    AutomatonResponse:
+      required:
+      - automatons
+      type: object
+      properties:
+        automatons:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomatonDTO'
+    FunctionDTO:
+      required:
+      - automatonCalls
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        automatonCalls:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomatonCallDTO'
+    ShiftDTO:
+      required:
+      - endStateId
+      - functionCalls
+      - startStateId
+      type: object
+      properties:
+        startStateId:
+          type: integer
+          format: int64
+        endStateId:
+          type: integer
+          format: int64
+        functionCalls:
+          type: array
+          items:
+            type: integer
+            format: int64
+    StateDTO:
+      required:
+      - id
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+    FilterDto:
+      required:
+      - key
+      - title
+      type: object
+      properties:
+        key:
+          type: string
+        title:
+          type: string
+    FilterResponse:
+      required:
+      - keys
+      type: object
+      properties:
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/FilterDto'
+    DirectoryChildrenResponse:
+      required:
+      - children
+      type: object
+      properties:
+        parentId:
+          type: integer
+          format: int64
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/DirectoryResponse'
+  securitySchemes:
+    cookieRefresh:
+      type: apiKey
+      name: cookieRefresh
+      in: cookie
+      scheme: refreshToken
+    cookieAuth:
+      type: apiKey
+      name: cookieAuth
+      in: cookie
+      scheme: accessToken
